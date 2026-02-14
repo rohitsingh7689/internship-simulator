@@ -1,24 +1,99 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-<title>Internship Simulator Fixed</title>
-<script src=""></script>
-<style>
-body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-.card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-button { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-#dash { display: none; }
-</style>
+    <meta charset="UTF-8">
+    <title>Internship Simulator | Rohit Singh</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; transition: 0.3s; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; background: #4f46e5; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn:hover { background: #4338ca; }
+        #dashboard, #certificate { display: none; }
+        .profile-pic { width: 80px; height: 80px; border-radius: 50%; border: 2px dashed #4f46e5; margin: 0 auto 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; }
+        #cert-box { background: white; padding: 40px; border: 10px solid #1e293b; width: 600px; margin: 20px auto; color: #1e293b; }
+    </style>
 </head>
 <body>
-<div id="login" class="card">
-<h2 style="color:#4f46e5">Internship Login</h2>
-<input type="text" id="username" placeholder="Enter Name">
-<input type="password" id="password" placeholder="Password">
-<button onclick="loginNow()">Login & Start</button>
-</div>
 
+    <div id="login" class="card">
+        <h2 style="color: #4f46e5;">Internship Login</h2>
+        <div class="profile-pic" onclick="document.getElementById('imgInput').click()">
+            <span id="plus-icon">+</span>
+            <img id="preview" style="display:none">
+        </div>
+        <input type="file" id="imgInput" hidden accept="image/*">
+        <input type="text" id="userName" placeholder="Your Name" value="rohit singh">
+        <input type="password" id="userPass" placeholder="Password (any)">
+        <button class="btn" onclick="handleLogin()">Login & Start</button>
+    </div>
 
+    <div id="dashboard" class="card" style="width: 500px;">
+        <h1 id="welcomeText">Welcome!</h1>
+        <p>Aapka simulator ab 100% working hai. ✅</p>
+        <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left;">
+            <p>• Profile Picture: <b>Added</b></p>
+            <p>• Login Logic: <b>Fixed</b></p>
+            <p>• Certificate: <b>Ready</b></p>
+        </div>
+        <button class="btn" onclick="showCertificate()">Claim Certificate</button>
+    </div>
+
+    <div id="certificate" style="text-align: center;">
+        <div id="cert-box">
+            <h1 style="font-size: 45px; margin: 0;">CERTIFICATE</h1>
+            <p>OF COMPLETION</p>
+            <h2 id="finalName" style="color: #4f46e5; font-size: 40px; font-style: italic;"></h2>
+            <p>Has successfully completed all virtual internship tasks.</p>
+            <p>Date: <b id="dateText"></b></p>
+        </div>
+        <button class="btn" style="width: 250px; background: #10b981;" onclick="downloadPDF()">Download PDF</button>
+        <button class="btn" style="width: 100px; background: #64748b;" onclick="location.reload()">Reset</button>
+    </div>
+
+    <script>
+        // Image Preview Logic
+        document.getElementById('imgInput').onchange = function(e) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('preview').src = reader.result;
+                document.getElementById('preview').style.display = 'block';
+                document.getElementById('plus-icon').style.display = 'none';
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        // Login Action
+        function handleLogin() {
+            const name = document.getElementById('userName').value;
+            if (name.trim() === "") {
+                alert("Please enter your name!");
+                return;
+            }
+            document.getElementById('welcomeText').innerText = "Welcome, " + name + "!";
+            document.getElementById('finalName').innerText = name;
+            document.getElementById('dateText').innerText = new Date().toLocaleDateString();
+            
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // Show Certificate
+        function showCertificate() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('certificate').style.display = 'block';
+        }
+
+        // PDF Download
+        function downloadPDF() {
+            const element = document.getElementById('cert-box');
+            html2pdf().from(element).save('Internship_Certificate.pdf');
+        }
+    </script>
+</body>
+</html>
 
