@@ -14,273 +14,206 @@
         :root { 
             --neon-blue: #00f3ff; --neon-purple: #bc13fe; --dark-bg: #050505; 
             --glass-bg: rgba(255, 255, 255, 0.03); --border-glow: rgba(0, 243, 255, 0.3);
+            --gold: #ffd700;
         }
         
         body { margin: 0; font-family: 'Rajdhani', sans-serif; background: var(--dark-bg); color: white; overflow: hidden; height: 100vh; }
 
-        /* --- LOGIN PAGE --- */
+        /* --- LOGIN & BIOMETRICS --- */
         #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #101010 0%, #000 100%); }
         .cyber-card { 
-            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(15px);
-            border: 1px solid var(--border-glow); padding: 50px; border-radius: 40px; 
-            width: 420px; text-align: center; position: relative; box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
+            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(15px); border: 1px solid var(--border-glow); 
+            padding: 40px; border-radius: 40px; width: 420px; text-align: center; box-shadow: 0 0 50px rgba(0, 243, 255, 0.1);
         }
+        #face-scan-container { display: none; position: relative; width: 170px; height: 170px; margin: 0 auto 20px; border: 2px solid var(--neon-blue); border-radius: 50%; overflow: hidden; }
+        #camera-feed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--neon-blue); animation: scanMove 2s infinite ease-in-out; }
+        @keyframes scanMove { 0%, 100% { top: 0; } 50% { top: 100%; } }
 
-        .nav-link { 
-            padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; gap: 10px; border: 1px solid transparent; background: rgba(255,255,255,0.05); color: #888;
-        }
-        .nav-link.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: white; text-shadow: 0 0 10px var(--neon-blue); }
-
-        .input-group input { 
-            width: 100%; padding: 15px; background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; outline: none; margin-bottom: 15px; box-sizing: border-box; font-family: 'Orbitron', sans-serif; font-size: 12px;
-        }
-
-        /* --- DASHBOARD GRID --- */
+        /* --- DASHBOARD STRUCTURE --- */
         .portal-grid { display: none; grid-template-columns: 280px 1fr; height: 100vh; }
-        .sidebar { background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-glow); padding: 30px; }
-        .content-area { padding: 40px; overflow-y: auto; }
+        .sidebar { background: rgba(0,0,0,0.5); border-right: 1px solid var(--border-glow); padding: 30px; display: flex; flex-direction: column; }
+        .content-area { padding: 40px; overflow-y: auto; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); }
+        .content-card { background: var(--glass-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; transition: 0.3s; }
+        .content-card:hover { border-color: var(--neon-blue); }
         
-        .stat-box { background: var(--glass-bg); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; margin-bottom: 20px; }
-        
-        .pro-btn { 
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            color: black; border: none; padding: 18px; border-radius: 12px;
-            font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; transition: 0.4s; width: 100%;
-        }
-        .pro-btn:hover { letter-spacing: 2px; box-shadow: 0 0 30px var(--neon-blue); transform: scale(1.02); }
+        /* --- GRAPHS & LISTS --- */
+        .dashboard-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
+        .graph-container { display: flex; align-items: flex-end; gap: 10px; height: 120px; padding-top: 20px; border-bottom: 1px solid #333; }
+        .bar { width: 100%; background: linear-gradient(to top, var(--neon-purple), var(--neon-blue)); border-radius: 5px 5px 0 0; position: relative; }
+        .bar::after { content: attr(data-score); position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--neon-blue); }
+        .item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #00ff00; box-shadow: 0 0 5px #00ff00; margin-right: 8px; }
 
-        /* --- AI CHATBOT UI --- */
-        #ai-launcher {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 0 20px var(--neon-blue); z-index: 2000; transition: 0.3s;
-        }
-        #ai-window {
-            position: fixed; bottom: 100px; right: 30px; width: 320px; height: 400px;
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px);
-            border: 1px solid var(--neon-blue); border-radius: 20px; display: none;
-            flex-direction: column; z-index: 2000; overflow: hidden; box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-        }
-        .ai-header { padding: 12px; background: rgba(0, 243, 255, 0.1); border-bottom: 1px solid var(--border-glow); font-family: 'Orbitron'; font-size: 12px; display: flex; justify-content: space-between; }
-        #ai-messages { flex: 1; padding: 15px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; line-height: 1.4; }
-        .bot { background: rgba(0, 243, 255, 0.1); align-self: flex-start; border: 1px solid rgba(0, 243, 255, 0.2); }
-        .user { background: var(--neon-purple); color: white; align-self: flex-end; }
-        .ai-input-area { padding: 12px; display: flex; gap: 10px; background: rgba(255,255,255,0.05); }
-        #ai-query { background: transparent; border: none; color: white; flex: 1; outline: none; font-size: 13px; }
-
-        /* --- CERTIFICATE --- */
-        #cert-page { display:none; padding:50px; background:#000; min-height:100vh; }
-        #cert-container {
-            width: 1000px; height: 700px; background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); 
-            color: white; padding: 60px; position: relative; border: 2px solid var(--neon-blue); margin: auto; 
-            box-sizing: border-box; overflow: hidden; box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
-        }
+        /* --- UI ELEMENTS --- */
+        .nav-link { padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); color: #888; margin-bottom: 8px; font-size: 14px; }
+        .nav-link.active { background: rgba(0, 243, 255, 0.1); border-color: var(--neon-blue); color: white; border: 1px solid var(--neon-blue); }
+        .pro-btn { background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); color: black; border: none; padding: 15px; border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; outline: none; margin-bottom: 10px; font-family: 'Orbitron'; font-size: 11px; box-sizing: border-box;}
     </style>
 </head>
 <body>
 
     <div id="login-page">
         <div class="cyber-card">
-            <h1 style="font-family:'Orbitron'; color:var(--neon-blue); letter-spacing: 2px; font-size: 24px;">VIRTUAL INTERNSHIP</h1>
-            <p style="color:#666; font-size:10px; margin-top:-10px; letter-spacing: 3px;">ROHIT SINGH ENTERPRISE</p>
+            <h1 style="font-family:'Orbitron'; color:var(--neon-blue); font-size: 22px;">VIRTUAL INTERNSHIP</h1>
+            <p style="color:#666; font-size:9px; letter-spacing: 2px; margin-bottom:20px;">ROHIT SINGH ENTERPRISE BIOMETRICS</p>
             
-            <div style="display:flex; gap:10px; margin: 30px 0;">
-                <button class="nav-link active" id="sTab" style="flex:1" onclick="setMode('student')">STUDENT</button>
-                <button class="nav-link" id="mTab" style="flex:1" onclick="setMode('mentor')">MENTOR</button>
+            <div id="face-scan-container"><video id="camera-feed" autoplay playsinline></video><div class="scan-line"></div></div>
+            <p id="scan-status" style="font-family:'Orbitron'; font-size:10px; color:var(--neon-blue); display:none; margin-bottom:15px;">ANALYZING BIOMETRICS...</p>
+
+            <div id="login-fields">
+                <div style="display:flex; gap:10px; margin-bottom: 15px;">
+                    <button class="nav-link active" id="sTab" style="flex:1" onclick="setMode('student')">STUDENT</button>
+                    <button class="nav-link" id="mTab" style="flex:1" onclick="setMode('mentor')">MENTOR</button>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="uName" placeholder="OPERATOR_ID" value="Rohit Singh">
+                    <input type="password" id="uPass" placeholder="SECURITY_KEY" value="12345">
+                    <div id="mAuth" style="display:none;"><input type="text" id="mKey" placeholder="CEO_CODE (ROHIT77)"></div>
+                </div>
             </div>
-            
-            <div class="input-group">
-                <input type="text" id="uName" placeholder="IDENTIFICATION_NAME" value="Rohit Singh">
-                <input type="password" id="uPass" placeholder="SECURITY_KEY" value="12345">
-                <div id="mAuth" style="display:none;"><input type="text" id="mKey" placeholder="CEO_ACCESS_CODE (ROHIT77)"></div>
-            </div>
-            <button class="pro-btn" onclick="initSystem()">INITIALIZE_PORTAL</button>
+            <button class="pro-btn" id="init-btn" onclick="startBiometricScan()">VERIFY IDENTITY</button>
         </div>
     </div>
 
     <div id="dashboard" class="portal-grid">
         <div class="sidebar">
-            <h2 style="font-family:'Orbitron'; font-size:16px; color:var(--neon-blue);">DASHBOARD_V11</h2>
-            <div class="nav-link active"><i class="fa fa-terminal"></i> Command Center</div>
-            <div class="nav-link" onclick="location.reload()" style="margin-top:auto;"><i class="fa fa-power-off"></i> Terminate</div>
+            <h2 style="font-family:'Orbitron'; font-size:16px; color:var(--neon-blue);">MASTER_v16.0</h2>
+            <div class="nav-link active"><i class="fa fa-home"></i> Home</div>
+            <div class="nav-link"><i class="fa fa-graduation-cap"></i> My Courses</div>
+            <div class="nav-link" onclick="toggleEditor()"><i class="fa fa-code"></i> Live Sandbox</div>
+            <div id="mentor-nav" class="nav-link" style="display:none; color:var(--gold);"><i class="fa fa-crown"></i> CEO Admin</div>
+            <div class="nav-link" onclick="location.reload()" style="margin-top:auto;"><i class="fa fa-power-off"></i> Logout</div>
         </div>
+
         <div class="content-area">
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-bottom:30px;">
-                <div class="stat-box"><h6>PROGRESS</h6><h2 id="pDisp" style="color:var(--neon-blue);">10%</h2></div>
-                <div class="stat-box"><h6>USER_ID</h6><h2 id="sideName" style="font-size:18px;">Rohit</h2></div>
-                <div class="stat-box"><h6>AI_ASSISTANT</h6><h2 style="font-size:18px; color:var(--neon-purple);">ONLINE</h2></div>
+            <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin-bottom:20px;">
+                <div class="content-card"><h6>SYNC_XP</h6><h3 id="userXP">500</h3></div>
+                <div class="content-card"><h6>RANK</h6><h3>#03</h3></div>
+                <div class="content-card"><h6>TASKS</h6><h3>01/10</h3></div>
+                <div class="content-card"><h6>LEVEL</h6><h3 style="color:var(--neon-purple);">ELITE</h3></div>
             </div>
-            
-            <div class="stat-box" style="padding:40px;">
-                <h3 style="font-family:'Orbitron';">NEURAL_SIMULATION_MODULE</h3>
-                <div style="width:100%; height:4px; background:rgba(255,255,255,0.1); margin:25px 0; border-radius: 10px; overflow: hidden;">
-                    <div id="progressFill" style="width:10%; height:100%; background:var(--neon-blue); box-shadow:0 0 15px var(--neon-blue);"></div>
-                </div>
-                <button class="pro-btn" id="taskBtn" style="width:250px;" onclick="processTask()">EXECUTE_NEXT_LAYER</button>
-            </div>
-            
-            <div class="stat-box">
-                <h4>CORE_SYSTEM_LOGS</h4>
-                <div id="logs" style="font-family:monospace; color:var(--neon-blue); font-size:12px; height:120px; overflow-y:auto;">
-                    <p>> System boot complete. Neural link ready.</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div id="ai-window">
-        <div class="ai-header">
-            <span><i class="fa fa-robot"></i> ROHIT_AI_v1.0</span>
-            <i class="fa fa-times" onclick="toggleAI()" style="cursor:pointer;"></i>
-        </div>
-        <div id="ai-messages">
-            <div class="msg bot">Greetings Intern. I am Rohit AI. I can guide you through the simulation. What is your query?</div>
-        </div>
-        <div class="ai-input-area">
-            <input type="text" id="ai-query" placeholder="Enter query..." onkeypress="if(event.key==='Enter') askAI()">
-            <i class="fa fa-paper-plane" onclick="askAI()" style="color:var(--neon-blue); cursor:pointer;"></i>
-        </div>
-    </div>
-    <div id="ai-launcher" onclick="toggleAI()"><i class="fa fa-brain" style="font-size: 24px; color: black;"></i></div>
-
-    <div id="cert-page">
-        <div id="cert-container">
-            <div style="position:absolute; top:20px; left:20px; border-left: 5px solid var(--neon-blue); border-top: 5px solid var(--neon-blue); width:80px; height:80px;"></div>
-            <div style="position:absolute; bottom:20px; right:20px; border-right: 5px solid var(--neon-purple); border-bottom: 5px solid var(--neon-purple); width:80px; height:80px;"></div>
-
-            <div style="text-align:center; position:relative; z-index:1;">
-                <h4 style="font-family:'Orbitron'; color:var(--neon-blue); letter-spacing:8px; margin-bottom:0;">VIRTUAL INTERNSHIP</h4>
-                <h1 style="font-family:'Orbitron'; font-size:55px; margin:10px 0; text-shadow: 0 0 20px var(--neon-blue);">CERTIFICATE</h1>
-                
-                <div style="margin: 50px 0;">
-                    <p style="font-size:18px; color:#888;">VERIFIED_INTERN_CREDENTIALS</p>
-                    <h2 style="font-family:'Orbitron'; font-size:40px; color:#fff; border-bottom: 1px solid rgba(0,243,255,0.3); display:inline-block; padding:0 30px;" id="finalName">ROHIT SINGH</h2>
-                    <p style="margin-top:20px; font-size:16px; color:#ccc;">Successfully validated all simulation layers at Rohit Singh Enterprise.</p>
-                </div>
-
-                <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:80px; padding:0 30px;">
-                    <div style="text-align:left; border-left:3px solid var(--neon-blue); padding-left:15px;">
-                        <h3 style="font-family:'Orbitron'; font-size:16px; margin:0; color:var(--neon-blue);">ROHIT SINGH</h3>
-                        <p style="font-size:11px; color:#666;">MD & CEO</p>
+            <div class="dashboard-layout">
+                <div class="left-pane">
+                    <div class="content-card" style="margin-bottom:20px;">
+                        <h4 style="font-family:'Orbitron'; font-size:11px; color:var(--neon-blue);">PERFORMANCE_ANALYTICS</h4>
+                        <div class="graph-container">
+                            <div class="bar" style="height: 40%;" data-score="40"></div>
+                            <div class="bar" style="height: 75%;" data-score="75"></div>
+                            <div class="bar" style="height: 55%;" data-score="55"></div>
+                            <div class="bar" style="height: 90%;" data-score="90"></div>
+                            <div class="bar" style="height: 30%;" data-score="30"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-around; margin-top:5px; font-size:10px; color:#555;">
+                            <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span>
+                        </div>
                     </div>
-                    <div id="qrcode" style="background:white; padding:5px; border-radius:5px;"></div>
-                    <div style="text-align:right;">
-                        <canvas id="sig" width="200" height="60" style="background:rgba(255,255,255,0.03); border-radius:10px;"></canvas>
-                        <p style="font-size:11px; color:#666; margin-top:5px;">DIGITAL_SIGNATURE</p>
+
+                    <div class="content-card">
+                        <h4 style="font-family:'Orbitron'; font-size:11px; color:var(--neon-purple);">INTERNSHIP_TRACKS</h4>
+                        <div class="item-row">
+                            <span><i class="fa fa-code"></i> Full Stack AI Web Dev</span>
+                            <span class="xp-badge" style="background:var(--neon-blue); color:black; font-size:10px; padding:2px 8px; border-radius:4px;">ACTIVE</span>
+                        </div>
+                        <div class="item-row" style="opacity:0.5;">
+                            <span><i class="fa fa-user-shield"></i> Advanced Cybersecurity</span>
+                            <span><i class="fa fa-lock"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-pane">
+                    <div class="content-card" style="margin-bottom:20px; background:rgba(188, 19, 254, 0.05); border:1px solid var(--neon-purple);">
+                        <h4 style="font-family:'Orbitron'; font-size:10px; color:var(--neon-purple);"><i class="fa fa-info-circle"></i> MENTOR_GUIDE</h4>
+                        <p style="font-size:11px; color:#aaa; line-height:1.6;">
+                            • Complete Neural Tasks for XP.<br>
+                            • Use Sandbox for code testing.<br>
+                            • Certificate unlocks at 5000 XP.
+                        </p>
+                    </div>
+
+                    <div class="content-card">
+                        <h4 style="font-family:'Orbitron'; font-size:10px; color:var(--neon-blue);">RECENT_ACTIVE</h4>
+                        <div class="item-row"><span><div class="status-dot"></div> Rohit (CEO)</span><span style="font-size:9px;">NOW</span></div>
+                        <div class="item-row"><span><div class="status-dot"></div> Aarav Sharma</span><span style="font-size:9px;">2m</span></div>
+                        <div class="item-row"><span><div class="status-dot" style="background:#555; box-shadow:none;"></div> Priya Patel</span><span style="font-size:9px;">1h</span></div>
                     </div>
                 </div>
             </div>
-            <div style="position:absolute; bottom:15px; left:50%; transform:translateX(-50%); font-family:monospace; font-size:10px; color:#444;">
-                AUTH_TIMESTAMP: <span id="certTime"></span>
+
+            <div class="content-card" style="margin-top:20px;">
+                <h4 style="font-family:'Orbitron'; font-size:11px;">ACTIVE_TASK: Neural Simulation Layer 01</h4>
+                <div style="width:100%; height:4px; background:rgba(255,255,255,0.05); border-radius:10px; margin:15px 0; overflow:hidden;">
+                    <div id="progressFill" style="width:10%; height:100%; background:var(--neon-blue); box-shadow:0 0 10px var(--neon-blue);"></div>
+                </div>
+                <button class="pro-btn" style="width:150px; font-size:11px;" onclick="processTask()">Execute Layer</button>
             </div>
         </div>
-        <button class="pro-btn" style="width:auto; margin:40px auto; display:block; padding:20px 60px;" onclick="downloadPDF()">DOWNLOAD_ENCRYPTED_PDF</button>
     </div>
 
     <script>
-        // --- AUDIO ENGINE ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playBeep(freq, type, dur) {
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + dur);
+        function playBeep(f, t, d) {
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.type = t; o.frequency.setValueAtTime(f, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + d);
         }
 
         let mode = 'student'; let prog = 1;
 
-        function setMode(m) { playBeep(600, 'sine', 0.1); mode = m; 
-            document.getElementById('sTab').classList.toggle('active', m === 'student');
-            document.getElementById('mTab').classList.toggle('active', m === 'mentor');
+        function setMode(m) { 
+            mode = m; 
+            document.getElementById('sTab').classList.toggle('active', m==='student'); 
+            document.getElementById('mTab').classList.toggle('active', m==='mentor'); 
             document.getElementById('mAuth').style.display = (m === 'mentor') ? 'block' : 'none';
         }
 
-        function initSystem() {
-            if(document.getElementById('uPass').value !== "12345") return alert("AUTH_ERROR");
-            if(mode === 'mentor' && document.getElementById('mKey').value !== "ROHIT77") return alert("CEO_KEY_REQUIRED");
-            playBeep(400, 'sawtooth', 0.3);
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'grid';
-            let name = document.getElementById('uName').value;
-            document.getElementById('sideName').innerText = name;
-            document.getElementById('finalName').innerText = name.toUpperCase();
+        async function startBiometricScan() {
+            const pass = document.getElementById('uPass').value;
+            const mKey = document.getElementById('mKey').value;
+            if(pass !== "12345") return alert("INVALID_KEY");
+            if(mode === 'mentor' && mKey !== "ROHIT77") return alert("CEO_CODE_REQUIRED");
+
+            const scanBox = document.getElementById('face-scan-container');
+            const statusText = document.getElementById('scan-status');
+            const video = document.getElementById('camera-feed');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                scanBox.style.display = 'block';
+                statusText.style.display = 'block';
+                document.getElementById('login-fields').style.display = 'none';
+                playBeep(800, 'sawtooth', 0.5);
+
+                setTimeout(() => {
+                    playBeep(1200, 'sine', 0.2);
+                    statusText.innerText = "MATCH_FOUND: 99.8%";
+                    statusText.style.color = "#00ff00";
+                    setTimeout(() => {
+                        stream.getTracks().forEach(t => t.stop());
+                        document.getElementById('login-page').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'grid';
+                        if(mode === 'mentor') document.getElementById('mentor-nav').style.display = 'flex';
+                    }, 1000);
+                }, 3000);
+            } catch (err) { alert("CAMERA_ERROR"); }
         }
 
         function processTask() {
-            playBeep(800, 'square', 0.05); prog++;
+            prog++; playBeep(900, 'square', 0.05);
             if(prog <= 10) {
-                document.getElementById('pDisp').innerText = (prog * 10) + "%";
                 document.getElementById('progressFill').style.width = (prog * 10) + "%";
-                addLog("Layer " + prog + " synchronized...");
             } else {
-                playBeep(500, 'sine', 0.3); confetti();
-                document.getElementById('taskBtn').outerHTML = "<button class='pro-btn' onclick='showCert()'>ACCESS_CERTIFICATE</button>";
-                addLog("Neural Handshake Complete.");
+                confetti(); alert("Certificate Unlocked!");
             }
-        }
-
-        function addLog(msg) {
-            const logs = document.getElementById('logs');
-            logs.innerHTML = `<p>> ${new Date().toLocaleTimeString()}: ${msg}</p>` + logs.innerHTML;
-        }
-
-        function toggleAI() {
-            const win = document.getElementById('ai-window');
-            win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
-            playBeep(800, 'sine', 0.1);
-        }
-
-        function askAI() {
-            const input = document.getElementById('ai-query'); const box = document.getElementById('ai-messages');
-            if(!input.value.trim()) return;
-            box.innerHTML += `<div class="msg user">${input.value}</div>`;
-            const q = input.value.toLowerCase(); input.value = '';
-            playBeep(600, 'sine', 0.05);
-            setTimeout(() => {
-                let r = "Data not found. Please follow CEO protocols.";
-                if(q.includes("hi") || q.includes("hello")) r = "System online. Greetings intern.";
-                if(q.includes("task")) r = "Click 'EXECUTE_NEXT_LAYER' to progress.";
-                if(q.includes("rohit") || q.includes("ceo")) r = "Rohit Singh is the architect of this system.";
-                box.innerHTML += `<div class="msg bot">${r}</div>`;
-                box.scrollTop = box.scrollHeight; playBeep(1000, 'sine', 0.1);
-            }, 700);
-        }
-
-        function showCert() {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('ai-launcher').style.display = 'none';
-            document.getElementById('cert-page').style.display = 'block';
-            document.getElementById('certTime').innerText = new Date().toLocaleString();
-            document.getElementById("qrcode").innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), { text: "VERIFIED-RS-V-" + Date.now(), width: 70, height: 70 });
-            initSig();
-        }
-
-        function initSig() {
-            const canvas = document.getElementById('sig'), ctx = canvas.getContext('2d');
-            let draw = false;
-            canvas.onmousedown = () => { draw = true; ctx.beginPath(); };
-            canvas.onmouseup = () => draw = false;
-            canvas.onmousemove = (e) => {
-                if(!draw) return; const r = canvas.getBoundingClientRect();
-                ctx.lineWidth = 2; ctx.strokeStyle = "#00f3ff"; ctx.lineTo(e.clientX - r.left, e.clientY - r.top); ctx.stroke();
-            };
-        }
-
-        function downloadPDF() {
-            html2pdf().from(document.getElementById('cert-container')).set({
-                margin:0, filename:'Virtual_Internship_Cert.pdf', html2canvas:{scale:2}, jsPDF:{unit:'px', format:[1000, 700], orientation:'landscape'}
-            }).save();
         }
     </script>
 </body>
 </html>
+
 
 
 
