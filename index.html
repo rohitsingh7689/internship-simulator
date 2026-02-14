@@ -3,214 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Internship Simulator | Rohit Singh</title>
+    <title>Pro Simulator | Rohit Singh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --nav-blue: #1e3a5f; --card-bg: #ffffff; --sidebar-blue: #2c4a73; --btn-blue: #3498db; --bg-gray: #f0f2f5; }
-        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg-gray); color: #333; }
+        :root { --navy: #1e3a5f; --gold: #b45309; --blue: #3498db; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
         
         #dash-screen, #cert-screen { display: none; }
 
-        /* LOGIN STYLE */
-        .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a5f 0%, #2c4a73 100%); }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .p-upload { width: 90px; height: 90px; border-radius: 50%; border: 2px dashed var(--btn-blue); margin: 0 auto 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .p-upload img { width: 100%; height: 100%; object-fit: cover; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        /* LOGIN SCREEN */
+        .login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--navy); }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 340px; text-align: center; }
+        .btn { padding: 12px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; }
 
-        /* DASHBOARD (SAME AS YOUR IMAGE) */
-        nav { background: var(--nav-blue); color: white; padding: 10px 4%; display: flex; justify-content: space-between; align-items: center; }
-        .main-grid { max-width: 1400px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 15px; }
-        
+        /* DASHBOARD LAYOUT (SAME AS IMAGE) */
+        nav { background: var(--navy); color: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .main-grid { max-width: 1300px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .stat-row { grid-column: 1 / span 3; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .stat-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left; position: relative; }
-        .stat-card b { font-size: 24px; color: #333; }
-        .progress-line { height: 8px; background: #eee; border-radius: 4px; margin-top: 10px; }
-        .fill { height: 100%; background: #3498db; border-radius: 4px; width: 0%; transition: 1s; }
+        .stat-box { background: white; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--blue); }
 
-        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .card-header { background: var(--sidebar-blue); color: white; padding: 10px 15px; margin: -20px -20px 15px -20px; border-radius: 8px 8px 0 0; font-size: 14px; }
-        
-        .btn { padding: 10px 20px; background: var(--btn-blue); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; width: 100%; }
-        .btn:hover { background: #2980b9; }
-
-        /* CERTIFICATE (ORIGINAL LOOK) */
+        /* CERTIFICATE PROFESSIONAL BOXES */
         .cert-view { padding: 40px 0; background: #374151; min-height: 100vh; text-align: center; }
-        .cert-paper { width: 850px; height: 600px; background: white; margin: 0 auto; border: 12px solid #1e3a5f; padding: 50px; position: relative; box-sizing: border-box; }
-        .cert-paper::after { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 2px solid #fbbf24; }
+        .cert-paper { width: 850px; height: 620px; background: white; margin: 0 auto; border: 12px solid var(--navy); padding: 40px; position: relative; box-sizing: border-box; }
+        .cert-paper::after { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 2px solid #fbbf24; pointer-events: none; }
         
-        .verify-box { position: absolute; top: 35px; right: 40px; text-align: right; font-family: monospace; font-size: 12px; }
-        .sig-container { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 50px; }
-        canvas { border-bottom: 1px solid #333; cursor: crosshair; background: #fcfcfc; }
+        .verify-tag { position: absolute; top: 30px; right: 40px; text-align: right; font-family: monospace; font-size: 11px; }
+
+        /* Signature & CEO Boxes */
+        .auth-row { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 40px; }
+        .auth-box { border: 1.5px solid #fbbf24; width: 220px; padding: 10px; position: relative; background: #fff; }
+        .auth-label { font-size: 13px; font-weight: bold; border-top: 1px solid #ccc; margin-top: 5px; padding-top: 5px; color: #333; }
+        
+        #sig-pad { background: #fdfdfd; cursor: crosshair; touch-action: none; display: block; margin: 0 auto; }
+        .ceo-name { color: var(--blue); font-weight: bold; font-size: 15px; margin: 5px 0; }
+
+        .dl-btn { background: #27ae60; width: 250px; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="login-page">
         <div class="login-card">
-            <h2 style="color:var(--nav-blue)">Employee Portal</h2>
-            <div class="p-upload" onclick="document.getElementById('imgIn').click()">
-                <i class="fa fa-camera" id="c-icon" style="color:#ccc"></i>
-                <img id="c-prev" style="display:none">
-            </div>
-            <input type="file" id="imgIn" hidden accept="image/*">
-            <input type="text" id="nameIn" placeholder="Full Name" value="Rohit Singh">
-            <input type="password" value="12345" placeholder="Password">
-            <button class="btn" onclick="startDash()">Login to Dashboard</button>
-            <p style="font-size:11px; color:#666; margin-top:10px;">Secure Connection Active</p>
+            <h2 style="color:var(--navy)">Employee Portal</h2>
+            <input type="text" id="nameIn" placeholder="Full Name" value="Rohit Singh" style="width:100%; padding:12px; margin-bottom:15px; border:1px solid #ddd; border-radius:8px;">
+            <button class="btn" onclick="goToDash()">Login to Dashboard</button>
         </div>
     </div>
 
     <div id="dash-screen">
         <nav>
             <b><i class="fa fa-briefcase"></i> VIRTUAL INTERNSHIP SIMULATOR</b>
-            <div style="display:flex; align-items:center; gap:10px;">
-                Welcome, <b id="uNameTop"></b>!
-                <img id="navPhoto" style="width:35px; height:35px; border-radius:50%; border:2px solid white;">
-            </div>
+            <div id="topName"></div>
         </nav>
-
         <div class="main-grid">
             <div class="stat-row">
-                <div class="stat-card"><small>Active Internship</small><br><b>Digital Marketing</b><br><small>10 Tasks</small></div>
-                <div class="stat-card"><small>Tasks Completed</small><br><b id="taskLabel">0 / 10</b></div>
-                <div class="stat-card"><small>Progress</small><br><b id="progLabel">0%</b><div class="progress-line"><div class="fill" id="p-bar"></div></div></div>
-                <div class="stat-card"><small>Certificates Earned</small><br><b>0</b><br><i class="fa fa-graduation-cap" style="position:absolute; right:15px; top:20px; font-size:24px; color:#ddd"></i></div>
+                <div class="stat-box"><small>Active Internship</small><br><b>Digital Marketing</b></div>
+                <div class="stat-box"><small>Tasks Completed</small><br><b>10 / 10</b></div>
+                <div class="stat-box"><small>Progress</small><br><b>100%</b></div>
+                <div class="stat-box"><small>Verified</small><br><b style="color:green">YES</b></div>
             </div>
-
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">Current Task</div>
-                    <h4 id="taskName">SEO Keyword Research</h4>
-                    <p style="font-size:12px; color:#666;">Due: April 20, 2026</p>
-                    <button class="btn" onclick="completeTask(this)">Continue Task</button>
-                </div>
-                <div class="card">
-                    <div class="card-header">Learning Resources</div>
-                    <p><small><i class="fa fa-play-circle"></i> SEO Basics Guide</small></p>
-                    <p><small><i class="fa fa-file-pdf"></i> Keyword Research Tutorial</small></p>
-                    <p><small><i class="fa fa-video"></i> Marketing Analytics Video</small></p>
-                </div>
+            <div class="card">
+                <h4>Current Task</h4>
+                <p>SEO Analytics Report</p>
+                <button class="btn" onclick="complete()">Finish Internship</button>
             </div>
-
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">Internship Progress</div>
-                    <img src="https://quickchart.io/chart?c={type:'line',data:{labels:['D1','D2','D3','D4','D5','D6','D7'],datasets:[{label:'Progress',data:[10,25,40,55,70,85,100],borderColor:'%233498db',fill:true,backgroundColor:'rgba(52,152,219,0.1)'}]}}" style="width:100%; border-radius:5px;">
-                </div>
-                <div class="card" style="display:flex; gap:12px;">
-                    <img src="https://ui-avatars.com/api/?name=Rahul+Verma&background=2c4a73&color=fff" style="width:45px; height:45px; border-radius:50%;">
-                    <div>
-                        <b>Mentor Feedback</b><br><small>Rahul Verma</small>
-                        <p style="font-size:12px; margin-top:5px; font-style:italic;">"Great job on your last task! Keep up the good work. Focus on keyword analysis."</p>
-                    </div>
-                </div>
+            <div class="card">
+                <h4>Performance Graph</h4>
+                <img src="https://quickchart.io/chart?c={type:'line',data:{labels:['D1','D2','D3','D4','D5'],datasets:[{label:'Skill',data:[20,40,65,80,100],borderColor:'blue'}]}}" style="width:100%;">
             </div>
-
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">Upcoming Meetings</div>
-                    <p><small><i class="fa fa-calendar"></i> Client Presentation (Tomorrow)</small></p>
-                    <p><small><i class="fa fa-user"></i> Mentor Check-in (Friday)</small></p>
-                </div>
-                <div id="reward-box" class="card" style="display:none; border:2px solid #27ae60; text-align:center;">
-                    <h4 style="color:#27ae60; margin:0;">Target Reached!</h4>
-                    <p style="font-size:11px;">You have completed all requirements.</p>
-                    <button class="btn" style="background:#27ae60" onclick="openCert()">Claim Certificate</button>
-                </div>
+            <div id="claim" class="card" style="display:none; border:2px solid green; text-align:center;">
+                <h4 style="color:green">Module Completed!</h4>
+                <button class="btn" style="background:green" onclick="openCert()">Download Certificate</button>
             </div>
         </div>
     </div>
 
     <div id="cert-screen" class="cert-view">
         <div class="cert-paper" id="pdf-area">
-            <div class="verify-box">
-                <b>SERIAL NO:</b> RS-2026-<span id="serNo"></span><br>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=55x55&data=VERIFIED-ROHIT" style="margin-top:5px;">
+            <div class="verify-tag">
+                SERIAL NO: RS-2026-<span id="serNo"></span><br>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=VERIFIED-ROHIT" style="margin-top:5px;">
             </div>
-            
-            <h4 style="color:#b45309; letter-spacing:4px; margin-top:20px;">OFFICIAL STATEMENT</h4>
-            <h1 style="font-size:55px; margin:15px 0; font-family:serif;">Certificate</h1>
-            <p>OF PROFESSIONAL INTERNSHIP</p>
-            <br>
-            <p>This is to certify that</p>
-            <h2 id="finalName" style="font-size:48px; color:#1e3a5f; font-family:'Brush Script MT', cursive; margin:10px 0;"></h2>
-            <p>has successfully displayed professional competence in the<br><b>Advanced Digital Simulator Program.</b></p>
-            <br>
-            <p style="font-size:12px;">Awarded on: <b id="date"></b></p>
 
-            <div class="sig-container">
-                <div style="text-align:center; width:200px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Jon_Kirsch_Signature.png" style="width:110px; filter:contrast(1.5);"><br>
-                    <div style="border-top:1px solid #333; padding-top:5px; font-size:13px;">Director's</div>
+            <div style="margin-top: 20px;">
+                <h4 style="color:var(--gold); letter-spacing:4px; margin:0;">OFFICIAL STATEMENT</h4>
+                <h1 style="font-size:55px; margin:10px 0; font-family:serif;">Certificate</h1>
+                <p>OF PROFESSIONAL INTERNSHIP</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <p style="font-size:18px;">This is to certify that</p>
+                <h2 id="finalName" style="font-size:45px; color:var(--navy); font-family:'Brush Script MT', cursive; margin:10px 0;"></h2>
+                <p>has successfully displayed professional competence in the<br><b>Advanced Digital Simulator Program.</b></p>
+                <p style="font-size:13px; margin-top:15px;">Awarded on: <b>14 February 2026</b></p>
+            </div>
+
+            <div class="auth-row">
+                <div class="auth-box">
+                    <small style="color:#666; font-size:10px;">CEO AUTHORITY</small><br>
+                    <div class="ceo-name" id="ceoName">Rohit Singh</div>
+                    <div class="auth-label">Chief Executive Officer</div>
                 </div>
-                <div style="text-align:center; width:200px;">
-                    <canvas id="sig-pad" width="200" height="70"></canvas>
-                    <div style="border-top:1px solid #333; padding-top:5px; font-size:13px;">Intern's Signature</div>
+
+                <div class="auth-box">
+                    <canvas id="sig-pad" width="180" height="60"></canvas>
+                    <div class="auth-label">Intern's Signature</div>
                 </div>
             </div>
         </div>
         <br>
-        <div style="display:flex; justify-content:center; gap:15px;">
-            <button class="btn" style="width:220px; background:#27ae60" onclick="save()">Download Official PDF</button>
-            <button class="btn" style="width:120px; background:#7f8c8d" onclick="location.reload()">Reset</button>
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn dl-btn" onclick="download()">Download Official PDF</button>
+            <button class="btn" style="width:120px; background:#666" onclick="ctx.clearRect(0,0,180,60)">Clear Sign</button>
         </div>
     </div>
 
     <script>
-        // Photo Preview Logic
-        document.getElementById('imgIn').onchange = (e) => {
-            const r = new FileReader();
-            r.onload = (v) => {
-                document.getElementById('c-prev').src = v.target.result;
-                document.getElementById('c-prev').style.display = 'block';
-                document.getElementById('navPhoto').src = v.target.result;
-                document.getElementById('c-icon').style.display = 'none';
-            };
-            r.readAsDataURL(e.target.files[0]);
-        };
-
-        // Login -> Dashboard
-        function startDash() {
-            const name = document.getElementById('nameIn').value;
-            if(!name) return alert("Please enter your name!");
-            document.getElementById('uNameTop').innerText = name;
-            document.getElementById('finalName').innerText = name;
+        function goToDash() {
+            const n = document.getElementById('nameIn').value;
+            if(!n) return alert("Enter Name");
+            document.getElementById('topName').innerText = "Welcome, " + n;
+            document.getElementById('finalName').innerText = n;
+            document.getElementById('ceoName').innerText = n; // CEO name set to user name
             document.getElementById('serNo').innerText = Math.floor(100000 + Math.random() * 900000);
-            document.getElementById('date').innerText = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
-            
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('dash-screen').style.display = 'block';
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
-        // Dashboard Interaction
-        let taskCount = 0;
-        function completeTask(btn) {
-            btn.innerText = "Task Finished ✅";
-            btn.disabled = true;
-            taskCount = 10; // Instantly finishing as per simulator feel
-            document.getElementById('taskLabel').innerText = "10 / 10";
-            document.getElementById('progLabel').innerText = "100%";
-            document.getElementById('p-bar').style.width = "100%";
-            document.getElementById('reward-box').style.display = 'block';
-            confetti({ particleCount: 50 });
+        function complete() {
+            document.getElementById('claim').style.display = 'block';
+            confetti({ particleCount: 100 });
         }
 
-        // Dashboard -> Certificate
         let canvas, ctx, drawing = false;
         function openCert() {
             document.getElementById('dash-screen').style.display = 'none';
             document.getElementById('cert-screen').style.display = 'block';
-            confetti({ particleCount: 200, spread: 100 });
             
             canvas = document.getElementById('sig-pad');
             ctx = canvas.getContext('2d');
             ctx.strokeStyle = "#00008b"; ctx.lineWidth = 2;
-            
-            canvas.onmousedown = () => { drawing = true; ctx.beginPath(); };
+
+            canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); };
             canvas.onmouseup = () => drawing = false;
             canvas.onmousemove = (e) => {
                 if(!drawing) return;
@@ -219,11 +156,11 @@
             };
         }
 
-        function save() {
+        function download() {
             const el = document.getElementById('pdf-area');
             html2pdf().from(el).set({
                 margin: 0,
-                filename: 'Official_Internship_Certificate.pdf',
+                filename: 'Rohit_Official_Certificate.pdf',
                 html2canvas: { scale: 3 },
                 jsPDF: { orientation: 'landscape' }
             }).save();
@@ -231,6 +168,7 @@
     </script>
 </body>
 </html>
+
 
 
 
