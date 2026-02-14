@@ -3,205 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Internship Simulator | Rohit Singh</title>
+    <title>Pro Internship Simulator | Rohit Singh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --blue-dark: #2c3e50; --blue-light: #3498db; --bg: #f4f7f9; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: #333; }
+        :root { --dark: #1e293b; --blue: #3b82f6; --bg: #f1f5f9; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); overflow-x: hidden; }
         
+        /* Hide sections initially */
         #dash-screen, #cert-screen { display: none; }
 
         /* 1. LOGIN SCREEN */
-        .login-wrap { display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 350px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .up-box { width: 90px; height: 90px; border-radius: 50%; border: 2px dashed var(--blue-light); margin: 0 auto 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .up-box img { width: 100%; height: 100%; object-fit: cover; }
+        .login-wrap { height: 100vh; display: flex; align-items: center; justify-content: center; background: #1e293b; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 340px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .p-up { width: 80px; height: 80px; border-radius: 50%; border: 2px dashed var(--blue); margin: 0 auto 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .p-up img { width: 100%; height: 100%; object-fit: cover; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
-        /* 2. DASHBOARD */
-        nav { background: var(--blue-dark); color: white; padding: 12px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .main-container { padding: 25px; display: grid; grid-template-columns: 1fr 2fr 1.2fr; gap: 20px; max-width: 1400px; margin: auto; }
-        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .top-stats { grid-column: 1 / span 3; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--blue-light); text-align: center; }
-        .progress-bar { height: 10px; background: #eee; border-radius: 5px; margin: 10px 0; overflow: hidden; }
-        .fill { height: 100%; background: var(--blue-light); width: 0%; transition: 1s; }
+        /* 2. DASHBOARD LAYOUT (FIXED) */
+        nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 10; }
+        .dash-container { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: grid; grid-template-columns: 2.5fr 1fr; gap: 20px; }
         
-        /* 3. FIXED CERTIFICATE & SIGNATURE */
-        .cert-bg { padding: 40px 0; background: #555; text-align: center; min-height: 100vh; }
-        .certificate { width: 850px; height: 600px; background: white; margin: 0 auto; border: 15px solid var(--blue-dark); padding: 50px; position: relative; box-sizing: border-box; }
-        .certificate::after { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid #d4af37; pointer-events: none; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 3px solid var(--blue); }
         
-        .sig-container { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 60px; }
-        .sig-box { text-align: center; width: 220px; }
-        .sig-line { border-top: 2px solid #333; margin-top: 5px; padding-top: 5px; font-weight: bold; }
-        
-        /* Signature Canvas Style */
-        #sig-canvas { border: 1px dashed #ccc; background: #fdfdfd; cursor: crosshair; border-radius: 4px; touch-action: none; }
+        .btn { padding: 12px 20px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #2563eb; }
 
-        .btn { padding: 12px 20px; background: var(--blue-light); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
-        .btn:hover { background: #2980b9; }
+        /* 3. CERTIFICATE (FIXED ARRANGEMENT) */
+        .cert-view { padding: 40px 0; background: #475569; min-height: 100vh; text-align: center; }
+        .cert-paper { width: 800px; height: 580px; background: white; margin: 0 auto; border: 12px solid #0f172a; padding: 50px; position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; }
+        .cert-paper::after { content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; border: 2px solid #fbbf24; pointer-events: none; }
+        
+        .sig-row { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 30px; }
+        .sig-col { text-align: center; width: 200px; }
+        canvas { background: #fafafa; border-bottom: 1px solid #000; cursor: crosshair; touch-action: none; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="login-wrap">
         <div class="login-card">
-            <h2 style="color:var(--blue-dark)">Employee Portal</h2>
-            <div class="up-box" onclick="document.getElementById('i').click()"><i class="fa fa-camera" id="p-icon"></i><img id="p-view" style="display:none"></div>
-            <input type="file" id="i" hidden accept="image/*">
-            <input type="text" id="n" placeholder="Full Name" value="Rohit Singh">
-            <input type="password" id="p" placeholder="Password" value="12345">
-            <button class="btn" onclick="startApp()">Login & Start</button>
+            <h3>Internship Portal</h3>
+            <div class="p-up" onclick="document.getElementById('fileIn').click()">
+                <i class="fa fa-user-circle" id="user-ic" style="font-size: 30px; color: #cbd5e1;"></i>
+                <img id="user-pv" style="display:none">
+            </div>
+            <input type="file" id="fileIn" hidden accept="image/*">
+            <input type="text" id="userName" placeholder="Full Name" value="Rohit Singh">
+            <input type="password" id="userPass" placeholder="Password" value="12345">
+            <button class="btn" onclick="appStart()">Login & Access Dashboard</button>
         </div>
     </div>
 
     <div id="dash-screen">
         <nav>
-            <b><i class="fa fa-briefcase"></i> VIRTUAL INTERNSHIP SIMULATOR</b>
-            <div style="display:flex; align-items:center; gap:10px;">Welcome, <b id="uName"></b><img id="navPic" style="width:35px; height:35px; border-radius:50%; border:2px solid white;"></div>
-        </nav>
-        <div class="main-container">
-            <div class="top-stats">
-                <div class="stat-box"><small>Active Internship</small><br><b>Digital Marketing</b></div>
-                <div class="stat-box"><small>Tasks Completed</small><br><b id="tCount">0 / 2</b></div>
-                <div class="stat-box"><small>Overall Progress</small><div class="progress-bar"><div class="fill" id="p-fill"></div></div><b id="p-text">0%</b></div>
-                <div class="stat-box"><small>Certificates Earned</small><br><b>0</b></div>
+            <b><i class="fa fa-layer-group"></i> SIMULATOR V.2</b>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span id="topName"></span>
+                <img id="topPhoto" style="width:35px; height:35px; border-radius:50%; background:#eee;">
             </div>
-            <div style="display:grid; gap:20px;">
-                <div class="card" style="background:var(--blue-dark); color:white;">
-                    <h4>Current Task</h4><p>SEO Keyword Research</p><button class="btn" style="background:var(--blue-light)" onclick="completeTask(this)">Finish Task</button>
+        </nav>
+
+        <div class="dash-container">
+            <div class="left-col">
+                <div class="stats-row">
+                    <div class="stat-box"><small>Task Done</small><br><b id="doneVal">0 / 2</b></div>
+                    <div class="stat-box"><small>Progress</small><br><b id="progVal">0%</b></div>
+                    <div class="stat-box"><small>Meetings</small><br><b>2</b></div>
+                    <div class="stat-box"><small>Rank</small><br><b>A+</b></div>
+                </div>
+                
+                <div class="card">
+                    <h4>Current Assignments</h4>
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:15px; border-radius:8px; margin-bottom:10px;">
+                        <span>Project: Data Analytics System</span>
+                        <button class="btn" style="width:auto; padding:6px 15px;" onclick="doTask(this)">Finish</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>Performance Analytics</h4>
+                    <img src="https://quickchart.io/chart?c={type:'bar',data:{labels:['W1','W2','W3','W4'],datasets:[{label:'Skill',data:[40,60,85,95]}]}}" style="width:100%; border-radius:8px;">
                 </div>
             </div>
-            <div class="card">
-                <h4>Internship Progress Graph</h4>
-                <img src="https://quickchart.io/chart?c={type:'line',data:{labels:['D1','D2','D3','D4','D5'],datasets:[{label:'Progress',data:[10,30,45,70,90],borderColor:'blue',fill:false}]}}" style="width:100%;">
-            </div>
-            <div id="reward-area" class="card" style="display:none; text-align:center;">
-                <h4 style="color:var(--blue-light)">Congratulations!</h4>
-                <button class="btn" onclick="showCert()">Claim Certificate</button>
+
+            <div class="right-col">
+                <div class="card">
+                    <h5>Mentor Message</h5>
+                    <p style="font-size:13px; color:#64748b;">"Rohit, your progress in data visualization is impressive. Finish the last task to unlock your certificate."</p>
+                </div>
+                <div id="claim-card" class="card" style="display:none; border:2px solid #22c55e; text-align:center;">
+                    <h5 style="color:#22c55e;">Milestone Reached!</h5>
+                    <button class="btn" onclick="showCert()">Get Certificate</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="cert-screen" class="cert-bg">
-        <div class="certificate" id="cert-pdf">
-            <h4 style="color:#d4af37; letter-spacing:4px; margin-bottom: 5px;">OFFICIAL STATEMENT</h4>
-            <h1 style="font-size:55px; margin:10px 0; font-family:serif;">Certificate</h1>
-            <p>OF PROFESSIONAL INTERNSHIP</p>
-            <br><br>
-            <p style="font-size: 18px;">Proudly presented to</p>
-            <h2 id="finalName" style="font-size:48px; color:var(--blue-light); font-family:'Brush Script MT', cursive; margin:10px 0;"></h2>
-            <p>For outstanding performance in the <b>Digital Marketing</b> module.</p>
-            <p>Awarded on: <b id="date"></b></p>
-            
-            <div class="sig-container">
-                <div class="sig-box">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Jon_Kirsch_Signature.png" style="width:120px; height:50px; object-fit:contain; filter: contrast(0.8);"><br>
-                    <div class="sig-line">Director's</div>
+    <div id="cert-screen" class="cert-view">
+        <div class="cert-paper" id="pdf-area">
+            <div>
+                <h4 style="color:#b45309; letter-spacing:3px; margin:0;">OFFICIAL CERTIFICATION</h4>
+                <h1 style="font-size:55px; margin:15px 0; font-family: serif;">Certificate</h1>
+                <p>OF INTERNSHIP COMPLETION</p>
+            </div>
+
+            <div>
+                <p style="font-size:18px;">This is to certify that</p>
+                <h2 id="finalName" style="font-size:45px; color:var(--blue); font-family:'Brush Script MT', cursive; margin:10px 0;"></h2>
+                <p>has successfully displayed professional competence in the<br><b>Advanced Digital Simulator Program.</b></p>
+            </div>
+
+            <div class="sig-row">
+                <div class="sig-col">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Jon_Kirsch_Signature.png" style="width:120px; opacity:0.7;">
+                    <div style="border-top:1px solid #000; padding-top:5px; font-size:14px;">Director's</div>
                 </div>
-                <div class="sig-box">
-                    <canvas id="sig-canvas" width="200" height="70"></canvas>
-                    <div class="sig-line">Intern's Signature</div>
+                <div class="sig-col">
+                    <canvas id="sig-pad" width="200" height="70"></canvas>
+                    <div style="border-top:1px solid #000; padding-top:5px; font-size:14px;">Your Signature</div>
                 </div>
             </div>
+            <p style="font-size:12px; color:#94a3b8; margin:0;">Issued on: <span id="issueDate"></span></p>
         </div>
         <br>
-        <div style="display: flex; justify-content: center; gap: 15px;">
-            <button class="btn" style="width:200px; background:#27ae60" onclick="download()">Download PDF</button>
-            <button class="btn" style="width:200px; background:#e67e22" onclick="clearSig()">Clear Signature</button>
-            <button class="btn" style="width:100px; background:#7f8c8d" onclick="location.reload()">Reset</button>
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn" style="width:200px; background:#10b981;" onclick="download()">Download PDF</button>
+            <button class="btn" style="width:120px; background:#64748b;" onclick="ctx.clearRect(0,0,200,70)">Clear Sign</button>
         </div>
     </div>
 
     <script>
-        // Photo & Login Handle
-        document.getElementById('i').onchange = (e) => {
+        // Photo Handle
+        document.getElementById('fileIn').onchange = (e) => {
             const r = new FileReader();
             r.onload = (v) => {
-                document.getElementById('p-view').src = v.target.result;
-                document.getElementById('p-view').style.display = 'block';
-                document.getElementById('navPic').src = v.target.result;
-                document.getElementById('p-icon').style.display = 'none';
+                document.getElementById('user-pv').src = v.target.result;
+                document.getElementById('user-pv').style.display = 'block';
+                document.getElementById('topPhoto').src = v.target.result;
+                document.getElementById('user-ic').style.display = 'none';
             };
             r.readAsDataURL(e.target.files[0]);
         };
 
-        function startApp() {
-            const name = document.getElementById('n').value;
+        function appStart() {
+            const name = document.getElementById('userName').value;
             if(!name) return alert("Please enter name");
-            document.getElementById('uName').innerText = name;
+            document.getElementById('topName').innerText = name;
             document.getElementById('finalName').innerText = name;
-            document.getElementById('date').innerText = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+            document.getElementById('issueDate').innerText = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+            
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('dash-screen').style.display = 'block';
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
         let tasks = 0;
-        function completeTask(btn) {
-            btn.innerText = "Completed ✅"; btn.disabled = true; tasks++;
-            document.getElementById('tCount').innerText = tasks + " / 2";
-            let p = tasks * 50;
-            document.getElementById('p-fill').style.width = p + "%";
-            document.getElementById('p-text').innerText = p + "%";
-            if(tasks >= 1) document.getElementById('reward-area').style.display = 'block';
+        function doTask(btn) {
+            btn.innerText = "Done ✅"; btn.disabled = true;
+            tasks++;
+            document.getElementById('doneVal').innerText = tasks + " / 2";
+            document.getElementById('progVal').innerText = (tasks*50) + "%";
+            if(tasks >= 1) document.getElementById('claim-card').style.display = 'block';
             confetti({ particleCount: 50 });
         }
 
-        // SIGNATURE LOGIC
         let canvas, ctx, drawing = false;
 
         function showCert() {
             document.getElementById('dash-screen').style.display = 'none';
             document.getElementById('cert-screen').style.display = 'block';
             confetti({ particleCount: 200, spread: 100 });
-            initSignature();
-        }
-
-        function initSignature() {
-            canvas = document.getElementById('sig-canvas');
+            
+            canvas = document.getElementById('sig-pad');
             ctx = canvas.getContext('2d');
-            ctx.strokeStyle = "#00008b"; // Navy blue ink
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#00008b"; ctx.lineWidth = 2;
 
-            function startDraw(e) {
-                drawing = true;
-                draw(e);
-            }
-            function endDraw() {
-                drawing = false;
-                ctx.beginPath();
-            }
-            function draw(e) {
-                if (!drawing) return;
+            canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); };
+            canvas.onmouseup = () => drawing = false;
+            canvas.onmousemove = (e) => {
+                if(!drawing) return;
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX || e.touches[0].clientX) - rect.left;
-                const y = (e.clientY || e.touches[0].clientY) - rect.top;
-                ctx.lineTo(x, y);
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
                 ctx.stroke();
-            }
-
-            canvas.addEventListener('mousedown', startDraw);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', endDraw);
-            canvas.addEventListener('touchstart', startDraw);
-            canvas.addEventListener('touchmove', draw);
-            canvas.addEventListener('touchend', endDraw);
-        }
-
-        function clearSig() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            };
+            // Touch Support
+            canvas.ontouchstart = (e) => { drawing = true; ctx.beginPath(); e.preventDefault(); };
+            canvas.ontouchend = () => drawing = false;
+            canvas.ontouchmove = (e) => {
+                if(!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+                ctx.stroke();
+                e.preventDefault();
+            };
         }
 
         function download() {
-            const el = document.getElementById('cert-pdf');
+            const el = document.getElementById('pdf-area');
             html2pdf().from(el).set({
                 margin: 0,
-                filename: 'Rohit_Certificate.pdf',
-                html2canvas: { scale: 2 },
+                filename: 'Certificate_Rohit.pdf',
+                html2canvas: { scale: 3 },
                 jsPDF: { orientation: 'landscape' }
             }).save();
         }
